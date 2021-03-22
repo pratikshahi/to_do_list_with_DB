@@ -3,26 +3,51 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const date = require(__dirname + "/date.js");
+const mongoose = require("mongoose");                 //requiring mongoose   
 
 const app = express();
 
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-const items = ["Buy Food", "Cook Food", "Eat Food"];
-const workItems = [];
+mongoose.connect("mongodb://localhost:27017/todolistDB", { useNewUrlParser: true, useUnifiedTopology: true });       //creating and connecting to DB in localhost
 
-app.get("/", function(req, res) {
+const itemSchema = {                                          //creating new moongose schema
+  name: String
+};
 
-const day = date.getDate();
+const Item = mongoose.model("Item", itemSchema);                     //creating mongoose model
 
-  res.render("list", {listTitle: day, newListItems: items});
+const item1 = new Item({                                           //CREATing 2 default data in items collection
+  name: "Wellcome to to do list"
+});
+const item2 = new Item({
+  name: "Hit + after you entered your list"
+});
+
+const defaultItems = [item1, item2];
+
+Item.insertMany(defaultItems, function (err) {                         //insert many item to db
+  if (err) {
+    console.log("error inside insertMany" + err);
+  }
+  else {
+    console.log("sucessfulliy saved defaultitem to db");
+  }
+});
+
+
+app.get("/", function (req, res) {
+
+  const day = date.getDate();
+
+  res.render("list", { listTitle: day, newListItems: items });
 
 });
 
-app.post("/", function(req, res){
+app.post("/", function (req, res) {
 
   const item = req.body.newItem;
 
@@ -35,14 +60,14 @@ app.post("/", function(req, res){
   }
 });
 
-app.get("/work", function(req,res){
-  res.render("list", {listTitle: "Work List", newListItems: workItems});
+app.get("/work", function (req, res) {
+  res.render("list", { listTitle: "Work List", newListItems: workItems });
 });
 
-app.get("/about", function(req, res){
+app.get("/about", function (req, res) {
   res.render("about");
 });
 
-app.listen(3000, function() {
+app.listen(3000, function () {
   console.log("Server started on port 3000");
 });
