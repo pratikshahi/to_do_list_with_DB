@@ -31,8 +31,11 @@ const item1 = new Item({
 const item2 = new Item({
   name: "Hit + after you entered your list",
 });
+const item3 = new Item({
+  name: "Hit checkbox to delete list item.",
+});
 
-const defaultItems = [item1, item2];
+const defaultItems = [item1, item2, item3];
 
 app.get("/", function (req, res) {
   Item.find(function (err, foundItems) {
@@ -64,6 +67,19 @@ app.post("/", function (req, res) {
   });
   item.save();
   res.redirect("/");
+});
+
+app.post("/delete", function (req, res) {
+  const deleteName = req.body.checkbox;
+
+  Item.deleteOne({ name: deleteName }, function (err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(deleteName);
+      res.redirect("/");
+    }
+  });
 });
 
 app.get("/work", function (req, res) {
