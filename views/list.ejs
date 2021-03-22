@@ -1,0 +1,36 @@
+<!-- Layout usuage using EJS -->
+<%- include("header") -%>
+  <div class="box" id="heading">
+    <!-- get the passed value in res.render by marker i.e; < %=  %>  -->
+    <h1>
+      <%= listTitle %>
+    </h1>
+  </div>
+  <!-- Scriplet tag < %   %> allows you to write jscode, ther is no gap betn first < and %  -->
+  <!-- < % if(dayName==="Saturday" || dayName==="Sunday" ){ %>
+    <h1 style="color: blueviolet">It's a < %= dayName %> !</h1>
+    < % }else{ %>
+    <h1 style="color: brown">It's a < %= dayName %> !</h1>
+    < %}%> -->
+
+
+  <div class="box">
+
+    <% for(let i=0;i<newListItems.length;i++){ %>
+      <div class="item">
+        <input type="checkbox">
+        <p>
+          <%= newListItems[i] %>
+        </p>
+      </div>
+      <% } %>
+
+        <form class="item" action="/" method="post">
+          <input type="text" name="addedList" placeholder="Insert next list item" autocomplete="off">
+          <button type="submit" name="list" value=<%=listTitle%>>+</button>
+        </form>
+
+  </div>
+
+  <!-- Layout usuage using EJS -->
+  <%- include("footer") -%>
