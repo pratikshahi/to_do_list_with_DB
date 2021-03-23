@@ -37,6 +37,13 @@ const item3 = new Item({
 
 const defaultItems = [item1, item2, item3];
 
+const listSchema = {
+  name: String,
+  items: [itemSchema],
+};
+
+const List = mongoose.model("List", listSchema);
+
 app.get("/", function (req, res) {
   Item.find(function (err, foundItems) {
     //reading data from db
@@ -58,6 +65,28 @@ app.get("/", function (req, res) {
 
   const day = date.getDate();
 });
+//express route parameter
+app.get("/:customList", function (req, res) {
+  const customListName = req.params.customList;
+
+  List.findOne({ name: customListName }, function (err, results) {
+    if (!err) {
+      if (!results) {
+        const list = new List({
+          name: customListName,
+          items: defaultItems,
+        });
+        list.save();
+        res.redirect("/" + customListName);
+      } else {
+        res.render("list", {
+          listTitle: results.name,
+          newListItems: results.items,
+        });
+      }
+    }
+  });
+});
 
 app.post("/", function (req, res) {
   const itemName = req.body.newItem;
@@ -70,9 +99,8 @@ app.post("/", function (req, res) {
 });
 
 app.post("/delete", function (req, res) {
-  const deleteName = req.body.checkbox;
-
-  Item.deleteOne({ name: deleteName }, function (err) {
+  let deleteName = req.body.checkbox;
+  Item.deleteMany({ name: deleteName }, function (err) {
     if (err) {
       console.log(err);
     } else {
@@ -80,10 +108,6 @@ app.post("/delete", function (req, res) {
       res.redirect("/");
     }
   });
-});
-
-app.get("/work", function (req, res) {
-  res.render("list", { listTitle: "Work List", newListItems: workItems });
 });
 
 app.get("/about", function (req, res) {
